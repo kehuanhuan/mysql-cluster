@@ -1,0 +1,81 @@
+version: '2'
+
+services:
+
+  applications:
+    image: tianon/true
+    # 需要和本机地址适配最好新建自己的分支来处理
+    volumes:
+      - ~/MysqlCluster:/var/www
+
+  management1:
+    image: mysql/mysql-cluster
+    entrypoint: /entrypoint.sh ndb_mgmd
+    volumes_from:
+      - applications
+      - ./mysql-cluster.cnf:/etc/mysql-cluster.cnf
+    networks:
+      cluster_net:
+        ipv4_address: 192.168.0.2
+    # tty: true
+
+  ndb1:
+    image: mysql/mysql-cluster
+    entrypoint: /entrypoint.sh ndb
+    volumes_from:
+      - applications
+      - ./mysql-cluster.cnf:/etc/mysql-cluster.cnf
+    networks:
+      cluster_net:
+        ipv4_address: 192.168.0.3
+    tty: true
+
+  ndb2:
+    image: mysql/mysql-cluster
+    entrypoint: /entrypoint.sh ndb
+    volumes_from:
+      - applications
+      - ./mysql-cluster.cnf:/etc/mysql-cluster.cnf
+    networks:
+      cluster_net:
+        ipv4_address: 192.168.0.4
+    tty: true
+
+  mysql1:
+    image: mysql/mysql-cluster
+    entrypoint: /entrypoint.sh mysqld
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+    volumes_from:
+      - applications
+      - ./mysql-cluster.cnf:/etc/mysql-cluster.cnf
+    networks:
+      cluster_net:
+        ipv4_address: 192.168.0.10
+    tty: true
+
+  management-client:
+    image: mysql/mysql-cluster
+    volumes_from:
+      - applications
+    networks:
+      cluster_net:
+        ipv4_address: 192.168.0.11
+    tty: true
+
+  workspace:
+    image: khhdocker/workspace
+    volumes_from:
+      - applications
+    networks:
+      cluster_net:
+        ipv4_address: 192.168.0.100
+    tty: true
+
+networks:
+  cluster_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 192.168.0.0/16
