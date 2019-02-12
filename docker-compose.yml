@@ -11,9 +11,10 @@ services:
   management1:
     image: mysql/mysql-cluster
     entrypoint: /entrypoint.sh ndb_mgmd
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
     volumes_from:
       - applications
-      - ./mysql-cluster.cnf:/etc/mysql-cluster.cnf
     networks:
       cluster_net:
         ipv4_address: 192.168.0.2
@@ -21,10 +22,11 @@ services:
 
   ndb1:
     image: mysql/mysql-cluster
-    entrypoint: /entrypoint.sh ndb
+    entrypoint: /entrypoint.sh ndbd
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
     volumes_from:
       - applications
-      - ./mysql-cluster.cnf:/etc/mysql-cluster.cnf
     networks:
       cluster_net:
         ipv4_address: 192.168.0.3
@@ -32,10 +34,11 @@ services:
 
   ndb2:
     image: mysql/mysql-cluster
-    entrypoint: /entrypoint.sh ndb
+    entrypoint: /entrypoint.sh ndbd
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
     volumes_from:
       - applications
-      - ./mysql-cluster.cnf:/etc/mysql-cluster.cnf
     networks:
       cluster_net:
         ipv4_address: 192.168.0.4
@@ -45,23 +48,14 @@ services:
     image: mysql/mysql-cluster
     entrypoint: /entrypoint.sh mysqld
     environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MYSQL_ROOT_PASSWORD=root
     volumes_from:
       - applications
-      - ./mysql-cluster.cnf:/etc/mysql-cluster.cnf
     networks:
       cluster_net:
         ipv4_address: 192.168.0.10
-    tty: true
+    # tty: true
 
-  management-client:
-    image: mysql/mysql-cluster
-    volumes_from:
-      - applications
-    networks:
-      cluster_net:
-        ipv4_address: 192.168.0.11
-    tty: true
 
   workspace:
     image: khhdocker/workspace

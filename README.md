@@ -1,3 +1,3 @@
 # mysql-cluster
 
-hui ia guo jina
+hui ia guo
