@@ -7,6 +7,7 @@ services:
     # 需要和本机地址适配最好新建自己的分支来处理
     volumes:
       - ~/MysqlCluster:/var/www
+      - ./mysql-cluster.cnf:/etc/mysql-cluster.cnf
 
   management1:
     image: mysql/mysql-cluster
@@ -18,7 +19,7 @@ services:
     networks:
       cluster_net:
         ipv4_address: 192.168.0.2
-    # tty: true
+    tty: true
 
   ndb1:
     image: mysql/mysql-cluster
@@ -44,7 +45,7 @@ services:
         ipv4_address: 192.168.0.4
     tty: true
 
-  mysql1:
+  mysqld1:
     image: mysql/mysql-cluster
     entrypoint: /entrypoint.sh mysqld
     environment:
@@ -54,6 +55,18 @@ services:
     networks:
       cluster_net:
         ipv4_address: 192.168.0.10
+    # tty: true
+
+  mysqld2:
+    image: mysql/mysql-cluster
+    entrypoint: /entrypoint.sh mysqld
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes_from:
+      - applications
+    networks:
+      cluster_net:
+        ipv4_address: 192.168.0.11
     # tty: true
 
 
